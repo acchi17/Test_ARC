@@ -3,6 +3,8 @@
 import rospy
 from transitions import Maschine
 
+
+if __name__ == '__main__':
 #definition of transitions
 
 
