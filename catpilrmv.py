@@ -1,19 +1,20 @@
 #!/usr/bin/env python
 #comment
 import rospy
-from transitions import Maschine
+from sensor_msgs.msg import Joy
+#from transitions import Maschine
 
-
-if __name__ == '__main__':
-  rospy.init_node('caterpillar')
-  rospy.Subscriber("joy", Joy, CaterpillarMove)
-  
 #definition of transitions
 
 
+def caterpillarMove(data):
+    rospy.loginfo(type(data))
+    rospy.loginfo(data.data)
+
+if __name__ == '__main__':
+  rospy.init_node('caterpillar')
+  rospy.Subscriber("joy", Joy, caterpillarMove)
+  rospy.spin()
+  
 
 
-
-#definition of callback function
-
-def CaterpillarMove
