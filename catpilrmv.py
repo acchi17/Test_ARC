@@ -4,7 +4,6 @@ import rospy
 from sensor_msgs.msg import Joy
 #from transitions import Machine
 import pigpio  # sudo apt install pigpio
-import time
 
 #definition of const values
 S_BUTTON = 0
@@ -17,6 +16,11 @@ FORWARD = 20
 BACK = 30
 TURN_RIGHT = 40
 TURN_LEFT = 50
+
+GPIO_CATPILR10 = 12
+GPIO_CATPILR11 = 18
+GPIO_CATPILR20 = 13
+GPIO_CATPILR21 = 19
 
 #definition of transitions
 '''
@@ -38,8 +42,14 @@ transitions = [
 #initial state = REST 
 mvstate = 10
 
+#create instance of pigpio.pi() class
+pi3 = pigpio.pi()
+#GPIO I/Omode setting
+pi3.set_mode()
+
 #definition of state functions
 def restfunc
+    pi3.set
     if ds4msg.button[S_BUTTON] = 1:
         
 
@@ -57,7 +67,7 @@ def caterpillarMove(ds4msg):
     
 
 if __name__ == '__main__':
-  rospy.init_node('caterpillar')
+  rospy.init_node('caterpillar')  
   rospy.Subscriber("joy", Joy, caterpillarMove)
   rospy.spin()
   
