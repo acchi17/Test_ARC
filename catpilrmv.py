@@ -17,10 +17,16 @@ BACK = 30
 TURN_RIGHT = 40
 TURN_LEFT = 50
 
-GPIO_CATPILR10 = 12
-GPIO_CATPILR11 = 18
-GPIO_CATPILR20 = 13
-GPIO_CATPILR21 = 19
+GPIO_CATPILR10 = 12  # front-left wheel
+GPIO_CATPILR11 = 18  # rear-left wheel
+GPIO_CATPILR20 = 13  # front-right wheel
+GPIO_CATPILR21 = 19  # rear-right wheel
+
+MTR_PWM_HZ = 10  # unit:Hz
+MTR_PWM_HZ_ZERO = 0  # unit:Hz
+LEFT_MTR_PWM_DUTY = 1000000  # unt:?
+RIGHT_MTR_PWM_DUTY = 1000000  # unt:?
+MTR_PWM_DUTY_ZERO = 0  # unt:?
 
 #definition of transitions
 '''
@@ -40,31 +46,116 @@ transitions = [
 
 #definition of gloval values
 #initial state = REST 
-mvstate = 10
+mvstate = REST
 
 #create instance of pigpio.pi() class
 pi3 = pigpio.pi()
 #GPIO I/Omode setting
-pi3.set_mode()
+pi3.set_mode(GPIO_CATPILR10, pigpio.OUTPUT)
+pi3.set_mode(GPIO_CATPILR11, pigpio.OUTPUT)
+pi3.set_mode(GPIO_CATPILR20, pigpio.OUTPUT)
+pi3.set_mode(GPIO_CATPILR21, pigpio.OUTPUT)
 
 #definition of state functions
+#REST state function
 def restfunc
-    pi3.set
+    #test code
+    printf(mvstate)
+    pi3.hardware_PWM(GPIO_CATPILR10, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
+    pi3.hardware_PWM(GPIO_CATPILR11, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
+    pi3.hardware_PWM(GPIO_CATPILR20, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
+    pi3.hardware_PWM(GPIO_CATPILR21, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
+    
     if ds4msg.button[S_BUTTON] = 1:
+        global mvstate
+        mvstate = TURN_LEFT
+        pi3.hardware_PWM(GPIO_CATPILR11, MTR_PWM_HZ, LEFT_MTR_PWM_DUTY)
+        pi3.hardware_PWM(GPIO_CATPILR20, MTR_PWM_HZ, RIGHT_MTR_PWM_DUTY)
         
+    elif ds4msg.button[X_BUTTON] = 1:
+        global mvstate
+        mvstate = BACK
+        pi3.hardware_PWM(GPIO_CATPILR11, MTR_PWM_HZ, LEFT_MTR_PWM_DUTY)
+        pi3.hardware_PWM(GPIO_CATPILR21, MTR_PWM_HZ, RIGHT_MTR_PWM_DUTY)
+        
+    elif ds4msg.button[C_BUTTON] = 1:
+        global mvstate
+        mvstate = TURN_RIGHT
+        pi3.hardware_PWM(GPIO_CATPILR10, MTR_PWM_HZ, LEFT_MTR_PWM_DUTY)
+        pi3.hardware_PWM(GPIO_CATPILR21, MTR_PWM_HZ, RIGHT_MTR_PWM_DUTY)
+        
+    elif ds4msg.button[T_BUTTON] = 1:
+        global mvstate
+        mvstate = FORWARD
+        pi3.hardware_PWM(GPIO_CATPILR10, MTR_PWM_HZ, LEFT_MTR_PWM_DUTY)
+        pi3.hardware_PWM(GPIO_CATPILR20, MTR_PWM_HZ, RIGHT_MTR_PWM_DUTY)
+    
+    else:
+        global mvstate
+        mvstate = REST
+        
+#FORWARD state function
+def forwardfunc
+    #test code
+    printf(mvstate)
+    if s4msg.button[T_BUTTON] != 1:
+        global mvstate
+        mvstate = REST
+        pi3.hardware_PWM(GPIO_CATPILR10, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
+        pi3.hardware_PWM(GPIO_CATPILR20, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
+    else:
+
+#BACK state function
+def backfunc
+    #test code
+    printf(mvstate)
+    if s4msg.button[X_BUTTON] != 1:
+        global mvstate
+        mvstate = REST
+        pi3.hardware_PWM(GPIO_CATPILR11, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
+        pi3.hardware_PWM(GPIO_CATPILR21, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
+    else:
+
+#TURN_RIGHT state function
+def turnrightfunc
+    #test code
+    printf(mvstate)
+    if s4msg.button[C_BUTTON] != 1:
+        global mvstate
+        mvstate = REST
+        pi3.hardware_PWM(GPIO_CATPILR10, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
+        pi3.hardware_PWM(GPIO_CATPILR21, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
+    else:
+
+#TURN_LEFT state function
+def turnlestfunc
+    #test code
+    printf(mvstate)
+    if s4msg.button[S_BUTTON] != 1:
+        global mvstate
+        mvstate = REST
+        pi3.hardware_PWM(GPIO_CATPILR11, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
+        pi3.hardware_PWM(GPIO_CATPILR20, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
+    else:
+
 
 def caterpillarMove(ds4msg):
     #test code
-    rospy.loginfo(type(ds4msg))
-    rospy.loginfo(ds4msg.data)
+    #rospy.loginfo(type(ds4msg))
+    #rospy.loginfo(ds4msg.data)
     
     if mvstate = REST:
-    elif mvstate = 20
-    elif mvstate = 30
-    elif mvstate = 40
-    elif mvstate = 50
+        restfunc
+    elif mvstate = FORWARD:
+        forwardfunc
+    elif mvstate = BACK:
+        backfunc
+    elif mvstate = TURN_RIGHT:
+        turnrightfunc
+    elif mvstate = TURN_LEFT:
+        turnlestfunc
     else:
-    
+        restfunc
 
 if __name__ == '__main__':
   rospy.init_node('caterpillar')  
