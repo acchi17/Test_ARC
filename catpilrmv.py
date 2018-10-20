@@ -3,6 +3,8 @@
 import rospy
 from sensor_msgs.msg import Joy
 #from transitions import Machine
+import pigpio  # sudo apt install pigpio
+import time
 
 #definition of const values
 S_BUTTON = 0
@@ -36,15 +38,17 @@ transitions = [
 #initial state = REST 
 mvstate = 10
 
+#definition of state functions
 def restfunc
-    if ds4msg.button
+    if ds4msg.button[S_BUTTON] = 1:
+        
 
 def caterpillarMove(ds4msg):
     #test code
     rospy.loginfo(type(ds4msg))
     rospy.loginfo(ds4msg.data)
     
-    if mvstate = 10:
+    if mvstate = REST:
     elif mvstate = 20
     elif mvstate = 30
     elif mvstate = 40
