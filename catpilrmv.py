@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-#comment
 import rospy
 from std_msgs.msg import UInt16MultiArray
 #from transitions import Machine
@@ -7,7 +6,7 @@ import pigpio  # sudo apt install pigpio
 
 #definition of const values
 S_BUTTON = 0
-X_BUTTUON = 1
+X_BUTTON = 1
 C_BUTTON = 2
 T_BUTTON = 3
 
@@ -60,7 +59,7 @@ pi3.set_mode(GPIO_CATPILR21, pigpio.OUTPUT)
 #REST state function
 def restfunc(data):
     #test code
-    printf(mvstate)
+    print(mvstate)
     pi3.hardware_PWM(GPIO_CATPILR10, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
     pi3.hardware_PWM(GPIO_CATPILR11, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
     pi3.hardware_PWM(GPIO_CATPILR20, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
@@ -96,61 +95,60 @@ def restfunc(data):
         
 #FORWARD state function
 def forwardfunc(data):
-    #test code
-    printf(mvstate)
+    print(mvstate)  # testcode
     if data != 1:
         global mvstate
         mvstate = REST
         pi3.hardware_PWM(GPIO_CATPILR10, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
         pi3.hardware_PWM(GPIO_CATPILR20, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
     else:
+        pass
 
 #BACK state function
 def backfunc(data):
-    #test code
-    printf(mvstate)
+    print(mvstate)  # testcode
     if data != 1:
         global mvstate
         mvstate = REST
         pi3.hardware_PWM(GPIO_CATPILR11, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
         pi3.hardware_PWM(GPIO_CATPILR21, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
     else:
+        pass
 
 #TURN_RIGHT state function
 def turnrightfunc(data):
-    #test code
-    printf(mvstate)
+    print(mvstate)  # testcode
     if data != 1:
         global mvstate
         mvstate = REST
         pi3.hardware_PWM(GPIO_CATPILR10, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
         pi3.hardware_PWM(GPIO_CATPILR21, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
     else:
+        pass
 
 #TURN_LEFT state function
 def turnlestfunc(data):
-    #test code
-    printf(mvstate)
+    print(mvstate)  # testcode
     if data != 1:
         global mvstate
         mvstate = REST
         pi3.hardware_PWM(GPIO_CATPILR11, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
         pi3.hardware_PWM(GPIO_CATPILR20, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
     else:
-
+        pass
 
 def caterpillarMove(ds4msg):
     
-    if mvstate = REST:
-        restfunc(ds4data)
-    elif mvstate = FORds4dataWARD:
-        forwardfunc(ds4data.data[T_BUTTON])
-    elif mvstate = BACK:
-        backfunc(ds4data.data[X_BUTTON])
-    elif mvstate = TURN_RIGHT:
-        turnrightfunc(ds4data.data[C_BUTTON])
-    elif mvstate = TURN_LEFT:
-        turnlestfunc(ds4data.data[X_BUTTON])
+    if mvstate == REST:
+        restfunc(ds4msg)
+    elif mvstate == FORWARD:
+        forwardfunc(ds4msg.data[T_BUTTON])
+    elif mvstate == BACK:
+        backfunc(ds4msg.data[X_BUTTON])
+    elif mvstate == TURN_RIGHT:
+        turnrightfunc(ds4msg.data[C_BUTTON])
+    elif mvstate == TURN_LEFT:
+        turnlestfunc(ds4msg.data[S_BUTTON])
     else:
         restfunc(ds4data)
 
@@ -158,5 +156,3 @@ if __name__ == '__main__':
   rospy.init_node('caterpillar')  
   rospy.Subscriber("ds4btns", UInt16MultiArray, caterpillarMove)
   rospy.spin()
-
-
