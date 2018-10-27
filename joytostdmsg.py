@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 import rospy
 from sensor_msgs.msg import Joy
-from std_msgs.msg import UInt8MultiArray
+from std_msgs.msg import UInt816ultiArray
 
-btnlist = [0] * 14
+btnlist = UInt816ultiArray()
+btnlist.data = [0] * 14
 
 def joytostdarray(ds4msg):
     global btnlist
-    for i in range(14)
-      btnlist[i] = ds4msg.buttons[i]
+    for i in range(14):
+      btnlist.data[i] = ds4msg.buttons[i]
 
 if __name__ == '__main__':
   rospy.init_node('joytostdmsg')  
