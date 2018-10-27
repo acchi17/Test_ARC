@@ -158,6 +158,5 @@ if __name__ == '__main__':
   rospy.init_node('caterpillar')  
   rospy.Subscriber("ds4btns", UInt16MultiArray, caterpillarMove)
   rospy.spin()
-  
 
 
