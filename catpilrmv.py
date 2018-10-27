@@ -4,6 +4,10 @@ from std_msgs.msg import UInt16MultiArray
 #from transitions import Machine
 import pigpio  # sudo apt install pigpio
 
+#debug code
+debuginfo = UInt16MultiArray()
+debuginfo.data = [0] * 2
+
 #definition of const values
 S_BUTTON = 0
 X_BUTTON = 1
@@ -151,8 +155,14 @@ def caterpillarMove(ds4msg):
         turnlestfunc(ds4msg.data[S_BUTTON])
     else:
         restfunc(ds4data)
-
+    #debug code
+    global debuginfo
+    debuginfo.data[0] = mvstate
+    pub.publish(debuginfo)
+    
 if __name__ == '__main__':
   rospy.init_node('caterpillar')  
   rospy.Subscriber("ds4btns", UInt16MultiArray, caterpillarMove)
+  #debug code
+  pub = rospy.Publisher('debug_ctplr', UInt16MultiArray, queue_size = 1)
   rospy.spin()
