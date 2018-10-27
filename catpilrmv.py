@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #comment
 import rospy
-from sensor_msgs.msg import Joy
+from std_msgs.msg import UInt16MultiArray
 #from transitions import Machine
 import pigpio  # sudo apt install pigpio
 
@@ -58,7 +58,7 @@ pi3.set_mode(GPIO_CATPILR21, pigpio.OUTPUT)
 
 #definition of state functions
 #REST state function
-def restfunc
+def restfunc(data):
     #test code
     printf(mvstate)
     pi3.hardware_PWM(GPIO_CATPILR10, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
@@ -66,25 +66,25 @@ def restfunc
     pi3.hardware_PWM(GPIO_CATPILR20, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
     pi3.hardware_PWM(GPIO_CATPILR21, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
     
-    if ds4msg.button[S_BUTTON] = 1:
+    if data.data[S_BUTTON] == 1:
         global mvstate
         mvstate = TURN_LEFT
         pi3.hardware_PWM(GPIO_CATPILR11, MTR_PWM_HZ, LEFT_MTR_PWM_DUTY)
         pi3.hardware_PWM(GPIO_CATPILR20, MTR_PWM_HZ, RIGHT_MTR_PWM_DUTY)
         
-    elif ds4msg.button[X_BUTTON] = 1:
+    elif data.data[X_BUTTON] == 1:
         global mvstate
         mvstate = BACK
         pi3.hardware_PWM(GPIO_CATPILR11, MTR_PWM_HZ, LEFT_MTR_PWM_DUTY)
         pi3.hardware_PWM(GPIO_CATPILR21, MTR_PWM_HZ, RIGHT_MTR_PWM_DUTY)
         
-    elif ds4msg.button[C_BUTTON] = 1:
+    elif data.data[C_BUTTON] == 1:
         global mvstate
         mvstate = TURN_RIGHT
         pi3.hardware_PWM(GPIO_CATPILR10, MTR_PWM_HZ, LEFT_MTR_PWM_DUTY)
         pi3.hardware_PWM(GPIO_CATPILR21, MTR_PWM_HZ, RIGHT_MTR_PWM_DUTY)
         
-    elif ds4msg.button[T_BUTTON] = 1:
+    elif data.data[T_BUTTON] == 1:
         global mvstate
         mvstate = FORWARD
         pi3.hardware_PWM(GPIO_CATPILR10, MTR_PWM_HZ, LEFT_MTR_PWM_DUTY)
@@ -95,10 +95,10 @@ def restfunc
         mvstate = REST
         
 #FORWARD state function
-def forwardfunc
+def forwardfunc(data):
     #test code
     printf(mvstate)
-    if s4msg.button[T_BUTTON] != 1:
+    if data != 1:
         global mvstate
         mvstate = REST
         pi3.hardware_PWM(GPIO_CATPILR10, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
@@ -106,10 +106,10 @@ def forwardfunc
     else:
 
 #BACK state function
-def backfunc
+def backfunc(data):
     #test code
     printf(mvstate)
-    if s4msg.button[X_BUTTON] != 1:
+    if data != 1:
         global mvstate
         mvstate = REST
         pi3.hardware_PWM(GPIO_CATPILR11, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
@@ -117,10 +117,10 @@ def backfunc
     else:
 
 #TURN_RIGHT state function
-def turnrightfunc
+def turnrightfunc(data):
     #test code
     printf(mvstate)
-    if s4msg.button[C_BUTTON] != 1:
+    if data != 1:
         global mvstate
         mvstate = REST
         pi3.hardware_PWM(GPIO_CATPILR10, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
@@ -128,10 +128,10 @@ def turnrightfunc
     else:
 
 #TURN_LEFT state function
-def turnlestfunc
+def turnlestfunc(data):
     #test code
     printf(mvstate)
-    if s4msg.button[S_BUTTON] != 1:
+    if data != 1:
         global mvstate
         mvstate = REST
         pi3.hardware_PWM(GPIO_CATPILR11, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
@@ -140,26 +140,23 @@ def turnlestfunc
 
 
 def caterpillarMove(ds4msg):
-    #test code
-    #rospy.loginfo(type(ds4msg))
-    #rospy.loginfo(ds4msg.data)
     
     if mvstate = REST:
-        restfunc
-    elif mvstate = FORWARD:
-        forwardfunc
+        restfunc(ds4data)
+    elif mvstate = FORds4dataWARD:
+        forwardfunc(ds4data.data[T_BUTTON])
     elif mvstate = BACK:
-        backfunc
+        backfunc(ds4data.data[X_BUTTON])
     elif mvstate = TURN_RIGHT:
-        turnrightfunc
+        turnrightfunc(ds4data.data[C_BUTTON])
     elif mvstate = TURN_LEFT:
-        turnlestfunc
+        turnlestfunc(ds4data.data[X_BUTTON])
     else:
-        restfunc
+        restfunc(ds4data)
 
 if __name__ == '__main__':
   rospy.init_node('caterpillar')  
-  rospy.Subscriber("joy", Joy, caterpillarMove)
+  rospy.Subscriber("ds4btns", UInt16MultiArray, caterpillarMove)
   rospy.spin()
   
 
