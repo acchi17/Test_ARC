@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import rospy
 from std_msgs.msg import UInt16MultiArray
-#from transitions import Machine
 import pigpio  # sudo apt install pigpio
 
 #debug code
@@ -21,31 +20,19 @@ TURN_RIGHT = 40
 TURN_LEFT = 50
 
 GPIO_CATPILR10 = 12  # front-left wheel
-GPIO_CATPILR11 = 18  # rear-left wheel
+GPIO_CATPILR11 = 5   # rear-left wheel
+#GPIO_CATPILR11 = 18  # rear-left wheel
 GPIO_CATPILR20 = 13  # front-right wheel
-GPIO_CATPILR21 = 19  # rear-right wheel
+GPIO_CATPILR21 = 6   # rear-right wheel
+#GPIO_CATPILR21 = 19  # rear-right wheel
 
-MTR_PWM_HZ = 10  # unit:Hz
+MTR_PWM_HZ = 100  # unit:Hz
 MTR_PWM_HZ_ZERO = 0  # unit:Hz
-LEFT_MTR_PWM_DUTY = 1000000  # unt:?
-RIGHT_MTR_PWM_DUTY = 1000000  # unt:?
+F_LEFT_MTR_PWM_DUTY = 1000000   # unit:?
+R_LEFT_MTR_PWM_DUTY = 255       # unit:?
+F_RIGHT_MTR_PWM_DUTY = 1000000  # unit:?
+R_RIGHT_MTR_PWM_DUTY = 255      # unit:?
 MTR_PWM_DUTY_ZERO = 0  # unt:?
-
-#definition of transitions
-'''
-states = ['REST', 'FORWARD', 'BACK', 'TURN_RIGHT', 'TURN_LEFT']
-
-transitions = [
-    { 'trigger': 'PUSH_T', 'source': 'REST', 'dest': 'FORWARD' },
-    { 'trigger': 'PUSH_X', 'source': 'REST', 'dest': 'BACK' },
-    { 'trigger': 'PUSH_C', 'source': 'REST', 'dest': 'TURN_RIGHT' }, 
-    { 'trigger': 'PUSH_S', 'source': 'REST', 'dest': 'TURN_LEFT' },
-    { 'trigger': 'PULL_T', 'source': 'FORWARD', 'dest': 'REST' },
-    { 'trigger': 'PULL_X', 'source': 'BACK', 'dest': 'REST' },
-    { 'trigger': 'PULL_C', 'source': 'TURN_RIGHT', 'dest': 'REST' },
-    { 'trigger': 'PULL_S', 'source': 'TURN_LEFT', 'dest': 'REST' },
-]
-'''
 
 #definition of gloval values
 #initial state = REST 
@@ -62,36 +49,44 @@ pi3.set_mode(GPIO_CATPILR21, pigpio.OUTPUT)
 #definition of state functions
 #REST state function
 def restfunc(data):
-    #test code
-    print(mvstate)
     pi3.hardware_PWM(GPIO_CATPILR10, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
-    pi3.hardware_PWM(GPIO_CATPILR11, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
+    pi3.set_PWM_dutycycle(GPIO_CATPILR11, MTR_PWM_DUTY_ZERO)
+    #pi3.hardware_PWM(GPIO_CATPILR11, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
     pi3.hardware_PWM(GPIO_CATPILR20, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
-    pi3.hardware_PWM(GPIO_CATPILR21, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
+    pi3.set_PWM_dutycycle(GPIO_CATPILR21, MTR_PWM_DUTY_ZERO)
+    #pi3.hardware_PWM(GPIO_CATPILR21, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
     
     if data.data[S_BUTTON] == 1:
         global mvstate
         mvstate = TURN_LEFT
-        pi3.hardware_PWM(GPIO_CATPILR11, MTR_PWM_HZ, LEFT_MTR_PWM_DUTY)
-        pi3.hardware_PWM(GPIO_CATPILR20, MTR_PWM_HZ, RIGHT_MTR_PWM_DUTY)
+        pi3.set_PWM_frequency(GPIO_CATPILR11, MTR_PWM_HZ)
+        pi3.set_PWM_dutycycle(GPIO_CATPILR11, R_LEFT_MTR_PWM_DUTY)
+        #pi3.hardware_PWM(GPIO_CATPILR11, MTR_PWM_HZ, LEFT_MTR_PWM_DUTY)
+        pi3.hardware_PWM(GPIO_CATPILR20, MTR_PWM_HZ, F_RIGHT_MTR_PWM_DUTY)
         
     elif data.data[X_BUTTON] == 1:
         global mvstate
         mvstate = BACK
-        pi3.hardware_PWM(GPIO_CATPILR11, MTR_PWM_HZ, LEFT_MTR_PWM_DUTY)
-        pi3.hardware_PWM(GPIO_CATPILR21, MTR_PWM_HZ, RIGHT_MTR_PWM_DUTY)
+        pi3.set_PWM_frequency(GPIO_CATPILR11, MTR_PWM_HZ)
+        pi3.set_PWM_dutycycle(GPIO_CATPILR11, R_LEFT_MTR_PWM_DUTY)
+        #pi3.hardware_PWM(GPIO_CATPILR11, MTR_PWM_HZ, LEFT_MTR_PWM_DUTY)
+        pi3.set_PWM_frequency(GPIO_CATPILR21, MTR_PWM_HZ)
+        pi3.set_PWM_dutycycle(GPIO_CATPILR21, R_RIGHT_MTR_PWM_DUTY)
+        #pi3.hardware_PWM(GPIO_CATPILR21, MTR_PWM_HZ, RIGHT_MTR_PWM_DUTY)
         
     elif data.data[C_BUTTON] == 1:
         global mvstate
         mvstate = TURN_RIGHT
-        pi3.hardware_PWM(GPIO_CATPILR10, MTR_PWM_HZ, LEFT_MTR_PWM_DUTY)
-        pi3.hardware_PWM(GPIO_CATPILR21, MTR_PWM_HZ, RIGHT_MTR_PWM_DUTY)
+        pi3.hardware_PWM(GPIO_CATPILR10, MTR_PWM_HZ, F_LEFT_MTR_PWM_DUTY)
+        pi3.set_PWM_frequency(GPIO_CATPILR21, MTR_PWM_HZ)
+        pi3.set_PWM_dutycycle(GPIO_CATPILR21, R_RIGHT_MTR_PWM_DUTY)
+        #pi3.hardware_PWM(GPIO_CATPILR21, MTR_PWM_HZ, RIGHT_MTR_PWM_DUTY)
         
     elif data.data[T_BUTTON] == 1:
         global mvstate
         mvstate = FORWARD
-        pi3.hardware_PWM(GPIO_CATPILR10, MTR_PWM_HZ, LEFT_MTR_PWM_DUTY)
-        pi3.hardware_PWM(GPIO_CATPILR20, MTR_PWM_HZ, RIGHT_MTR_PWM_DUTY)
+        pi3.hardware_PWM(GPIO_CATPILR10, MTR_PWM_HZ, F_LEFT_MTR_PWM_DUTY)
+        pi3.hardware_PWM(GPIO_CATPILR20, MTR_PWM_HZ, F_RIGHT_MTR_PWM_DUTY)
     
     else:
         global mvstate
@@ -99,7 +94,6 @@ def restfunc(data):
         
 #FORWARD state function
 def forwardfunc(data):
-    print(mvstate)  # testcode
     if data != 1:
         global mvstate
         mvstate = REST
@@ -110,33 +104,34 @@ def forwardfunc(data):
 
 #BACK state function
 def backfunc(data):
-    print(mvstate)  # testcode
     if data != 1:
         global mvstate
         mvstate = REST
-        pi3.hardware_PWM(GPIO_CATPILR11, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
-        pi3.hardware_PWM(GPIO_CATPILR21, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
+        pi3.set_PWM_dutycycle(GPIO_CATPILR11, MTR_PWM_DUTY_ZERO)
+        #pi3.hardware_PWM(GPIO_CATPILR11, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
+        pi3.set_PWM_dutycycle(GPIO_CATPILR21, MTR_PWM_DUTY_ZERO)
+        #pi3.hardware_PWM(GPIO_CATPILR21, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
     else:
         pass
 
 #TURN_RIGHT state function
 def turnrightfunc(data):
-    print(mvstate)  # testcode
     if data != 1:
         global mvstate
         mvstate = REST
         pi3.hardware_PWM(GPIO_CATPILR10, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
-        pi3.hardware_PWM(GPIO_CATPILR21, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
+        pi3.set_PWM_dutycycle(GPIO_CATPILR21, MTR_PWM_DUTY_ZERO)
+        #pi3.hardware_PWM(GPIO_CATPILR21, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
     else:
         pass
 
 #TURN_LEFT state function
 def turnlestfunc(data):
-    print(mvstate)  # testcode
     if data != 1:
         global mvstate
         mvstate = REST
-        pi3.hardware_PWM(GPIO_CATPILR11, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
+        pi3.set_PWM_dutycycle(GPIO_CATPILR11, MTR_PWM_DUTY_ZERO)
+        #pi3.hardware_PWM(GPIO_CATPILR11, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
         pi3.hardware_PWM(GPIO_CATPILR20, MTR_PWM_HZ_ZERO, MTR_PWM_DUTY_ZERO)
     else:
         pass
